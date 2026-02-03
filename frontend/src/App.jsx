@@ -7,6 +7,7 @@ import RoomDetails from "./pages/RoomDetails";
 import BookingForm from "./pages/BookingForm";
 import MyBookings from "./pages/MyBookings";
 import AdminPanel from "./pages/AdminPanel";
+import ForgotPassword from "./pages/ForgotPassword";
 import Footer from "./components/Footer";
 
 function App() {
@@ -17,12 +18,13 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/rooms" element={<Rooms />} />
-            <Route path="/rooms/:id" element={<RoomDetails />} />
+            <Route path="/room-details/:id" element={<RoomDetails />} />
             <Route path="/book/:roomId" element={<BookingForm />} />
             <Route path="/my-bookings" element={<MyBookings />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
           </Routes>
         </div>
 

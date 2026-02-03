@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hotel.dto.ForgotPasswordDTO;
 import com.hotel.dto.JwtResponseDTO;
 import com.hotel.dto.LoginRequestDTO;
 import com.hotel.dto.RegisterRequestDTO;
@@ -34,5 +35,12 @@ public class AuthController {
             @RequestBody LoginRequestDTO request) {
 
         return ResponseEntity.ok(authService.login(request));
+    }
+    
+    
+    
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordDTO request) {
+        return ResponseEntity.ok(authService.resetPassword(request));
     }
 }

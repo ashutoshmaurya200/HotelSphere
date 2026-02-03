@@ -4,6 +4,7 @@ package com.hotel.service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.hotel.dto.ForgotPasswordDTO;
 import com.hotel.dto.JwtResponseDTO;
 import com.hotel.dto.LoginRequestDTO;
 import com.hotel.dto.RegisterRequestDTO;
@@ -46,6 +47,10 @@ public class AuthServiceImpl implements AuthService {
         } else {
             user.setRole(request.getRole());
         }
+        user.setPhone(request.getPhone());
+        
+        user.setSecretQuestion(request.getSecretQuestion());
+        user.setSecretAnswer(request.getSecretAnswer());
 
         userRepository.save(user);
         return "User registered successfully";
@@ -67,4 +72,22 @@ public class AuthServiceImpl implements AuthService {
         
         return new JwtResponseDTO(token, user.getUserId(), user.getFullName(), user.getRole());
     }
+    
+    public String resetPassword(ForgotPasswordDTO request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Check if the secret answer matches (Case insensitive is better for UX)
+        if (user.getSecretAnswer() == null || 
+                !user.getSecretAnswer().equalsIgnoreCase(request.getSecretAnswer())) {
+                throw new RuntimeException("Incorrect secret answer!");
+            }
+        // Encrypt and save new password
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        return "Password reset successfully!";
+    }
+    
+    
 }

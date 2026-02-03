@@ -65,7 +65,6 @@ public class PaymentController {
      */
     @PostMapping("/pay")
     public ResponseEntity<Payment> makePayment(@RequestBody PaymentRequestDTO request) {
-        // request should now include the razorpay_payment_id from the frontend
         Payment payment = paymentService.createPayment(
                 request.getBookingId(),
                 request.getAmount(),

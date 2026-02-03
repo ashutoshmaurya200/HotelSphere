@@ -22,6 +22,9 @@ public class Booking {
     private LocalDate checkOutDate;
     private String bookingStatus; 
     
+    @Column(precision = 10, scale = 2)
+    private BigDecimal amountPaid = BigDecimal.ZERO;
+    
     // CONFIRMED, CANCELLED
 
    

@@ -45,6 +45,11 @@ public class User implements UserDetails {
 
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
+	
+	
+	
+	private String secretQuestion; // e.g., "What is your pet's name?"
+	private String secretAnswer;   // e.g., "Tommy"
 
 	@OneToMany(mappedBy = "user")
 	@JsonIgnore

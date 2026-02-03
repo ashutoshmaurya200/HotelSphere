@@ -48,11 +48,11 @@ const BookingForm = () => {
         roomId: roomId,
         checkInDate: dates.checkIn,
         checkOutDate: dates.checkOut,
-        // 🔥 This sends PENDING, but your Backend MUST accept it!
+        //  This sends PENDING, but your Backend MUST accept it!
         bookingStatus: "PENDING",
       };
 
-      await api.post("/bookings", bookingData);
+      await api.post("/bookings/create", bookingData);
 
       alert("Booking Initiated! Please go to 'My Bookings' to Pay.");
       navigate("/my-bookings");

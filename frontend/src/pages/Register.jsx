@@ -11,7 +11,10 @@ const Register = () => {
     email: "",
     password: "",
     phone: "",
-    role: "USER", // Default role
+    role: "USER",
+
+    secretQuestion: "What is your favorite color?",
+    secretAnswer: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -19,25 +22,47 @@ const Register = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (error) setError("");
+  };
+
+  const validateForm = () => {
+    const { phone, password, secretAnswer } = formData;
+
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(phone)) {
+      setError("Phone number must be exactly 10 digits.");
+      return false;
+    }
+
+    const strictPasswordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    if (!strictPasswordRegex.test(password)) {
+      setError(
+        "Password must be 8+ chars, with Upper, Lower, Number & Special Char.",
+      );
+      return false;
+    }
+
+    //  Check Secret Answer
+    if (secretAnswer.length < 2) {
+      setError("Please provide a valid secret answer.");
+      return false;
+    }
+
+    return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
+    if (!validateForm()) return;
 
+    setLoading(true);
     try {
-      // Sending data to: /api/auth/register
       await api.post("/auth/register", formData);
       alert("Registration Successful! Please Login.");
       navigate("/login");
     } catch (err) {
-      console.error(err);
-      // Try to get error message from backend or use default
-      const msg =
-        err.response?.data ||
-        "Registration failed. Try using a different email.";
-      setError(msg);
+      setError(err.response?.data || "Registration failed.");
     } finally {
       setLoading(false);
     }
@@ -53,9 +78,10 @@ const Register = () => {
         >
           <div className="card-body">
             <h3 className="text-center fw-bold mb-4">Create Account</h3>
-
             {error && (
-              <div className="alert alert-danger text-center">{error}</div>
+              <div className="alert alert-danger text-center small">
+                {error}
+              </div>
             )}
 
             <form onSubmit={handleSubmit}>
@@ -65,7 +91,7 @@ const Register = () => {
                   type="text"
                   name="fullName"
                   className="form-control"
-                  placeholder="John Doe"
+                  placeholder="Vivek  or  Ashutosh"
                   value={formData.fullName}
                   onChange={handleChange}
                   required
@@ -91,24 +117,63 @@ const Register = () => {
                   type="tel"
                   name="phone"
                   className="form-control"
-                  placeholder="+91 9876543210"
+                  placeholder="9876543210"
                   value={formData.phone}
                   onChange={handleChange}
                   required
                 />
               </div>
 
-              <div className="mb-4">
+              <div className="mb-3">
                 <label className="form-label">Password</label>
                 <input
                   type="password"
                   name="password"
                   className="form-control"
-                  placeholder="******"
+                  placeholder="Pass@123"
                   value={formData.password}
                   onChange={handleChange}
                   required
                 />
+              </div>
+
+              {/*  Secret Question Selection */}
+              <div className="mb-3">
+                <label className="form-label">Security Question</label>
+                <select
+                  name="secretQuestion"
+                  className="form-select"
+                  value={formData.secretQuestion}
+                  onChange={handleChange}
+                >
+                  <option value="What is your favorite color?">
+                    What is your favorite color?
+                  </option>
+                  <option value="What is your pet's name?">
+                    What is your pet's name?
+                  </option>
+
+                  <option value="What city were you born in?">
+                    What city were you born in?
+                  </option>
+                </select>
+              </div>
+
+              {/* Secret Answer Input */}
+              <div className="mb-4">
+                <label className="form-label">Security Answer</label>
+                <input
+                  type="text"
+                  name="secretAnswer"
+                  className="form-control"
+                  placeholder="Your Answer"
+                  value={formData.secretAnswer}
+                  onChange={handleChange}
+                  required
+                />
+                <div className="form-text small">
+                  You will need this to reset your password.
+                </div>
               </div>
 
               <div className="d-grid">
@@ -124,10 +189,7 @@ const Register = () => {
 
             <div className="text-center mt-3">
               <p className="text-muted">
-                Already have an account?{" "}
-                <Link to="/login" className="text-decoration-none">
-                  Login here
-                </Link>
+                Already have an account? <Link to="/login">Login here</Link>
               </p>
             </div>
           </div>

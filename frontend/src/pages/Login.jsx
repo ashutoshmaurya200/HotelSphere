@@ -76,6 +76,15 @@ const Login = () => {
                 </Link>
               </p>
             </div>
+
+            <div className="text-end mb-3">
+              <Link
+                to="/forgot-password"
+                style={{ fontSize: "0.9rem", textDecoration: "none" }}
+              >
+                Forgot Password?
+              </Link>
+            </div>
           </div>
         </div>
       </div>

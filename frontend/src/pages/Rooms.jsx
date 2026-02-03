@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
 
-// 1. New Image Mapping Object
+// Image Mapping
 const roomTypeImages = {
   "Single Standard":
     "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=800",
@@ -41,18 +41,15 @@ const roomTypeImages = {
     "https://images.unsplash.com/photo-1554995207-c18c203602cb?q=80&w=800",
 };
 
-// Fallback image if name doesn't match
 const defaultImage =
   "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=800";
 
 const Rooms = () => {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // 1. Fetch Rooms (Either All or Available)
   useEffect(() => {
     const fetchRooms = async () => {
       setLoading(true);
@@ -60,19 +57,15 @@ const Rooms = () => {
         const checkIn = searchParams.get("checkIn");
         const checkOut = searchParams.get("checkOut");
         const type = searchParams.get("type");
-
         let res;
 
         if (checkIn && checkOut) {
-          console.log("Searching for available rooms...");
           res = await api.get(
             `/rooms/available?checkIn=${checkIn}&checkOut=${checkOut}&roomType=${type || ""}`,
           );
         } else {
-          console.log("Fetching all rooms...");
           res = await api.get("/rooms");
         }
-
         setRooms(res.data);
       } catch (error) {
         console.error("Error fetching rooms:", error);
@@ -80,15 +73,15 @@ const Rooms = () => {
         setLoading(false);
       }
     };
-
     fetchRooms();
   }, [searchParams]);
 
-  // 2. Handle "View Details" Click
-  const handleBookNow = (roomId) => {
+  // 🔥 CHANGED: Navigates to Room Details Page first
+  const handleViewDetails = (roomId) => {
     const checkIn = searchParams.get("checkIn");
     const checkOut = searchParams.get("checkOut");
-    let targetUrl = `/book/${roomId}`;
+    // Go to /room-details/ID instead of /book/ID
+    let targetUrl = `/room-details/${roomId}`;
     if (checkIn && checkOut) {
       targetUrl += `?checkIn=${checkIn}&checkOut=${checkOut}`;
     }
@@ -98,7 +91,6 @@ const Rooms = () => {
   return (
     <>
       <Navbar />
-
       <div className="container mt-5">
         <div className="text-center mb-5">
           <h2 className="fw-bold">Our Accommodations</h2>
@@ -111,23 +103,17 @@ const Rooms = () => {
 
         {loading ? (
           <div className="text-center mt-5">
-            <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </div>
+            <div className="spinner-border text-primary"></div>
           </div>
         ) : rooms.length === 0 ? (
           <div className="text-center mt-5">
-            <div className="alert alert-warning d-inline-block px-5">
-              <h4>No rooms available.</h4>
-              <p className="mb-0">Try changing your dates or room type.</p>
-            </div>
+            <h4>No rooms available.</h4>
           </div>
         ) : (
           <div className="row">
             {rooms.map((room) => (
               <div className="col-md-4 mb-4" key={room.roomId}>
                 <div className="card shadow border-0 h-100 transition-hover">
-                  {/* 🔥 3. USING THE NEW MAPPER HERE */}
                   <img
                     src={
                       room.roomType
@@ -135,33 +121,28 @@ const Rooms = () => {
                         : defaultImage
                     }
                     className="card-img-top"
-                    alt={room.roomType?.name || "Room"}
+                    alt="Room"
                     style={{ height: "250px", objectFit: "cover" }}
                   />
-
                   <div className="card-body d-flex flex-column">
                     <div className="d-flex justify-content-between align-items-center mb-2">
                       <h5 className="card-title fw-bold mb-0">
-                        {room.roomType
-                          ? room.roomType.name
-                          : `Room ${room.roomNumber}`}
+                        {room.roomType?.name || `Room ${room.roomNumber}`}
                       </h5>
                       <span className="badge bg-primary px-3 py-2">
                         ₹{room.roomType?.basePricePerNight || "0"} / night
                       </span>
                     </div>
-
                     <p className="text-muted small mb-2">
                       Room No: {room.roomNumber} • Floor: {room.floor}
                     </p>
-
                     <p className="card-text text-secondary">
-                      {room.roomType?.description ||
-                        "Experience luxury and comfort."}
+                      {room.roomType?.description?.substring(0, 100)}...
                     </p>
 
+                    {/* 🔥 CHANGED: Button calls handleViewDetails */}
                     <button
-                      onClick={() => handleBookNow(room.roomId)}
+                      onClick={() => handleViewDetails(room.roomId)}
                       className="btn btn-outline-primary w-100 mt-auto"
                     >
                       View Details
